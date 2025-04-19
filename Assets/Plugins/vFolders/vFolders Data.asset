@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adb9c12a8c6c949f7af83a3d238359d0, type: 3}
+  m_Name: vFolders Data
+  m_EditorClassIdentifier: 
+  folderDatas_byGuid:
+    keys:
+    - 399cb2e116aa5974a9a33e7c555bca71
+    - 02ba917673d64a841b7957c60e0de0fd
+    - 635fa4d136fb61347a5e91d716914ec9
+    - 9c53962885c2c4f449125a979d6ad240
+    - 3624e1f3d5c2947458549215894f98b9
+    - 717f30f9ec6c4f98a82aca2a1aa8c43d
+    - 00f45fcabc2befd45b7bafe47d8ee10e
+    values:
+    - iconNameOrGuid: Cubemap Icon
+      colorIndex: 1
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: cs Script Icon
+      colorIndex: 5
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: Prefab Icon
+      colorIndex: 7
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: 
+      colorIndex: 3
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: 
+      colorIndex: 9
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: 
+      colorIndex: 2
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: AnimationClip Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+  bookmarks:
+  - guid: 02ba917673d64a841b7957c60e0de0fd
+  - guid: 635fa4d136fb61347a5e91d716914ec9
+  - guid: 9c53962885c2c4f449125a979d6ad240
+  - guid: 399cb2e116aa5974a9a33e7c555bca71
