@@ -1,5 +1,4 @@
 using UnityEngine;
-using Pathfinding;
 
 namespace _Scripts.Island
 {
