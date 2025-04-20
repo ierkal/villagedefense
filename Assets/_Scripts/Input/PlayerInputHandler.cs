@@ -1,4 +1,5 @@
 using _Scripts.Main.Services;
+using _Scripts.Utility;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -51,7 +52,8 @@ namespace _Scripts.Input
         private void HandleClick(InputAction.CallbackContext ctx)
         {
             Vector2 mousePosition = Mouse.current.position.ReadValue();
-            OnClick?.Invoke(mousePosition);
+            ServiceLocator.Instance.Get<ClickRouter>()?.RouteClick(mousePosition);
         }
+
     }
 }

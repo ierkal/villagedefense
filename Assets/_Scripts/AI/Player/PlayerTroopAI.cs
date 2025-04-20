@@ -1,12 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using _Scripts.AI.Player.FSM;
 using _Scripts.AI.Core;
+using _Scripts.AI.Pathfinding;
+using _Scripts.Island;
 using _Scripts.OdinAttributes;
+using UnityEngine;
 
 namespace _Scripts.AI.Player
 {
     [LogTag("PlayerTroopAI")]
-    
     [RequireComponent(typeof(TroopAnimationController))]
     [RequireComponent(typeof(TroopStateMachine))]
     public class PlayerTroopAI : BaseTroopAI
@@ -15,6 +17,7 @@ namespace _Scripts.AI.Player
         [SerializeField] private float _moveSpeed = 2f;
         [SerializeField] private float _attackRange = 1.5f;
 
+        public HexTile CurrentTile { get; set; }
         public bool IsSelected { get; private set; }
 
         protected override void Awake()
@@ -27,6 +30,19 @@ namespace _Scripts.AI.Player
         {
             Target = newTarget;
             StateMachine.SetState(new MoveCommandState(this));
+        }
+
+        public void MoveToTile(HexTile tile, Dictionary<Vector2Int, GameObject> allTiles)
+        {
+            if (tile == null || CurrentTile == null) return;
+
+            var path = Pathfinder.FindPath(CurrentTile, tile, allTiles);
+            if (path.Count > 0)
+            {
+                Target = tile.transform;
+                SetMoveTarget(tile.transform); // Triggers MoveCommandState
+                CurrentTile = tile;
+            }
         }
 
         public void EnterDefendMode(Transform threat)
@@ -42,11 +58,8 @@ namespace _Scripts.AI.Player
 
         public override bool HasTarget() => Target != null;
         public override bool TargetIsDead() => Target == null;
-        public override bool IsInAttackRange()
-        {
-            if (Target == null) return false;
-            return Vector3.Distance(transform.position, Target.position) <= _attackRange;
-        }
+        public override bool IsInAttackRange() =>
+            Target != null && Vector3.Distance(transform.position, Target.position) <= _attackRange;
 
         public override void MoveToTarget()
         {

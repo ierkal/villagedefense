@@ -5,7 +5,6 @@ using _Scripts.OdinAttributes;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using _Scripts.Utility;
-using Unity.AI.Navigation;
 
 namespace _Scripts.Island
 {
@@ -31,7 +30,6 @@ namespace _Scripts.Island
         [MinValue(1)]
         [Tooltip("Total number of hex tiles to generate on start.")]
         public int StartingTileCount = 10;
-        [SerializeField] private NavMeshSurface _navMeshSurface;
 
         
         [Title("Debug / Runtime")]
@@ -48,7 +46,6 @@ namespace _Scripts.Island
         {
             GenerateConnectedRandomIsland();
             yield return new WaitForSeconds(.2f);
-            _navMeshSurface.BuildNavMesh();
             Log.Info(this, "A* Grid Re-scanned.");
         }
         private void GenerateConnectedRandomIsland()
