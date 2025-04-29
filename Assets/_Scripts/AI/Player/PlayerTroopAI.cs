@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using _Scripts.AI.Player.FSM;
 using _Scripts.AI.Core;
-using _Scripts.AI.Pathfinding;
 using _Scripts.Island;
 using _Scripts.OdinAttributes;
+using _Scripts.Utility;
 using UnityEngine;
 
 namespace _Scripts.AI.Player
@@ -32,18 +32,18 @@ namespace _Scripts.AI.Player
             StateMachine.SetState(new MoveCommandState(this));
         }
 
-        public void MoveToTile(HexTile tile, Dictionary<Vector2Int, GameObject> allTiles)
+        public void MoveToTile(HexTile targetTile)
         {
-            if (tile == null || CurrentTile == null) return;
-
-            var path = Pathfinder.FindPath(CurrentTile, tile, allTiles);
-            if (path.Count > 0)
+            if (targetTile == null)
             {
-                Target = tile.transform;
-                SetMoveTarget(tile.transform); // Triggers MoveCommandState
-                CurrentTile = tile;
+                Log.Warning(this, "MoveToTile was given null target!");
+                return;
             }
+
+            Target = targetTile.transform;
+            StateMachine.SetState(new MoveCommandState(this));
         }
+
 
         public void EnterDefendMode(Transform threat)
         {

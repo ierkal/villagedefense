@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using _Scripts.Input;
 using _Scripts.Main;
 using _Scripts.Main.Services;
+using _Scripts.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +10,6 @@ namespace _Scripts.Island
 {
     public class BuildManager : MonoBehaviour, IGameService
     {
-        private PlayerInputHandler _inputHandler;
-    
         public HexagonManager HexManager;
         public GameObject FarmHexPrefab;
 
@@ -22,46 +21,51 @@ namespace _Scripts.Island
         private bool _isPlacingFarm = false;
         private List<HexTile> _highlightedTiles = new();
         public Material DefaultMaterial;
-    
+        private BuildPlacementClickHandler _buildClickHandler;
+
     
 
         private void Start()
         {
 
             BuildFarmButton.onClick.AddListener(EnterBuildMode);
-            _inputHandler = ServiceLocator.Instance.Get<PlayerInputHandler>();
         }
 
         public void EnterBuildMode()
         {
             _isPlacingFarm = true;
             HighlightEligibleTiles();
+    
+            _buildClickHandler ??= new BuildPlacementClickHandler(this);
+            ServiceLocator.Instance.Get<ClickRouter>()?.SetClickHandler(_buildClickHandler);
 
-            _inputHandler.OnClick += HandleClick;
-            _inputHandler.OnCancel += ExitBuildMode;
             ServiceLocator.Instance.Get<GameManager>().SwitchToBuild();
-
         }
 
-        void HighlightEligibleTiles()
+        private void HighlightEligibleTiles()
         {
+            _highlightedTiles.Clear(); // Always clear first!
+
             foreach (var kvp in HexManager.PlacedTiles)
             {
                 GameObject hex = kvp.Value;
+                if (hex == null) continue;
+
                 HexTile tile = hex.GetComponent<HexTile>();
                 Renderer rend = hex.GetComponentInChildren<Renderer>();
+                if (tile == null || rend == null) continue;
 
-                if (tile.HasBuilding)
+                bool isEligible = !tile.HasBuilding;
+
+                rend.material = isEligible ? GreenHighlightMaterial : RedHighlightMaterial;
+
+                if (isEligible)
                 {
-                    rend.material = RedHighlightMaterial;
-                }
-                else
-                {
-                    rend.material = GreenHighlightMaterial;
                     _highlightedTiles.Add(tile);
                 }
             }
         }
+
         private void ReplaceWithFarm(HexTile tile)
         {
             Vector2Int pos = tile.GridPosition;
@@ -94,27 +98,35 @@ namespace _Scripts.Island
 
             _highlightedTiles.Clear();
 
-            _inputHandler.OnClick -= HandleClick;
-            _inputHandler.OnCancel -= ExitBuildMode;
-            
             ServiceLocator.Instance.Get<GameManager>().SwitchToIsland();
+            ServiceLocator.Instance.Get<ClickRouter>()?.ClearClickHandler();
+
 
         }
     
-        private void HandleClick(Vector2 screenPosition)
+        public void HandleBuildClick(Vector2 screenPosition)
         {
             if (Camera.main == null) return;
-            
+        
             Ray ray = Camera.main.ScreenPointToRay(screenPosition);
 
-            if (!Physics.Raycast(ray, out RaycastHit hit)) return;
-            
-            HexTile clickedTile = hit.collider.GetComponentInParent<HexTile>();
-            if (clickedTile != null && !clickedTile.HasBuilding && _highlightedTiles.Contains(clickedTile))
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                ReplaceWithFarm(clickedTile);
+                Debug.Log($"[BuildManager] Hit: {hit.collider.gameObject.name}"); // 🔥
+        
+                HexTile clickedTile = hit.collider.GetComponentInParent<HexTile>();
+                if (clickedTile != null && !clickedTile.HasBuilding && _highlightedTiles.Contains(clickedTile))
+                {
+                    ReplaceWithFarm(clickedTile);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BuildManager] No Raycast hit detected."); // 🔥
             }
         }
+
+
 
     }
 }
