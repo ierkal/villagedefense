@@ -6,15 +6,6 @@
             "id": "69978fc3-f67a-4f70-9707-2fdbb96e027b",
             "actions": [
                 {
-                    "name": "Click",
-                    "type": "Button",
-                    "id": "f9597c8a-6f4a-4fdb-9954-5ea097b73d1b",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Pause",
                     "type": "Button",
                     "id": "184d537c-85dd-4263-a3f4-84a9f55ae9e0",
@@ -61,17 +52,6 @@
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "2ca0ecb6-c0a5-42fb-ba2f-0d07837c31f9",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Click",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "",
                     "id": "53729189-d9cf-47cc-b3ba-7806acc6a0c9",
@@ -152,6 +132,102 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Building",
+            "id": "b1a7a608-1c89-455d-8b7f-07ffcf85095b",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "be868bbc-d5a9-4497-b972-f3d524f672ea",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightClick",
+                    "type": "Button",
+                    "id": "81429d45-1da2-4f04-9605-a0a587b32368",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b9b9a5f8-8f63-4f7f-bba0-375a0532a1fc",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c63f1f22-43da-488b-9517-83d99694d67a",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "RightClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UnitCommand",
+            "id": "fe9adb45-2246-4f10-9c89-0ec4f49001bc",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "d8e09c01-fd83-4060-b15c-b0ef20d4b0e3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightClick",
+                    "type": "Button",
+                    "id": "21b877cf-fefd-4662-b815-cbd707f9ed24",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8121967f-f2f2-48f9-8fae-5f3e258ddda9",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "92287f6d-1905-463b-9709-6ec9c7d6698c",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "RightClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -10,23 +10,24 @@ namespace _Scripts.Island
 {
     public class BuildManager : MonoBehaviour, IGameService
     {
+        private PlayerInputHandler _inputHandler;
+    
+        [Header("References")]
         public HexagonManager HexManager;
         public GameObject FarmHexPrefab;
+        public Button BuildFarmButton;
 
+        [Header("Materials")]
         public Material GreenHighlightMaterial;
         public Material RedHighlightMaterial;
-
-        public Button BuildFarmButton;
+        public Material DefaultMaterial;
 
         private bool _isPlacingFarm = false;
         private List<HexTile> _highlightedTiles = new();
-        public Material DefaultMaterial;
-        private BuildPlacementClickHandler _buildClickHandler;
-
-    
 
         private void Start()
         {
+            _inputHandler = ServiceLocator.Instance.Get<PlayerInputHandler>();
 
             BuildFarmButton.onClick.AddListener(EnterBuildMode);
         }
@@ -35,98 +36,124 @@ namespace _Scripts.Island
         {
             _isPlacingFarm = true;
             HighlightEligibleTiles();
-    
-            _buildClickHandler ??= new BuildPlacementClickHandler(this);
-            ServiceLocator.Instance.Get<ClickRouter>()?.SetClickHandler(_buildClickHandler);
 
-            ServiceLocator.Instance.Get<GameManager>().SwitchToBuild();
-        }
+            // 🔥 Subscribe to input
+            _inputHandler.OnClick += HandleBuildClick;
+            _inputHandler.OnRightClick += HandleCancelBuild;
 
-        private void HighlightEligibleTiles()
-        {
-            _highlightedTiles.Clear(); // Always clear first!
+            ServiceLocator.Instance.Get<InputContextManager>()?.EnableBuildControls();
+            ServiceLocator.Instance.Get<GameManager>()?.SwitchToBuild();
 
-            foreach (var kvp in HexManager.PlacedTiles)
-            {
-                GameObject hex = kvp.Value;
-                if (hex == null) continue;
-
-                HexTile tile = hex.GetComponent<HexTile>();
-                Renderer rend = hex.GetComponentInChildren<Renderer>();
-                if (tile == null || rend == null) continue;
-
-                bool isEligible = !tile.HasBuilding;
-
-                rend.material = isEligible ? GreenHighlightMaterial : RedHighlightMaterial;
-
-                if (isEligible)
-                {
-                    _highlightedTiles.Add(tile);
-                }
-            }
-        }
-
-        private void ReplaceWithFarm(HexTile tile)
-        {
-            Vector2Int pos = tile.GridPosition;
-
-            Destroy(HexManager.PlacedTiles[pos]);
-
-            Vector3 worldPos = HexManager.OffsetToWorld(pos);
-            GameObject newHex = Instantiate(FarmHexPrefab, worldPos, Quaternion.identity, HexManager.TileParent);
-            HexTile newTile = newHex.GetComponent<HexTile>();
-            newTile.GridPosition = pos;
-            newTile.HasBuilding = true;
-
-            HexManager.PlacedTiles[pos] = newHex;
-
-            ExitBuildMode();
+            Debug.Log("[BuildManager] Entered Build Mode.");
         }
 
         public void ExitBuildMode()
         {
             _isPlacingFarm = false;
 
+            // 🔥 Unsubscribe to input
+            _inputHandler.OnClick -= HandleBuildClick;
+            _inputHandler.OnRightClick -= HandleCancelBuild;
+
+            RestoreTileMaterials();
+            _highlightedTiles.Clear();
+
+            ServiceLocator.Instance.Get<GameManager>()?.SwitchToIsland();
+
+            Debug.Log("[BuildManager] Exited Build Mode.");
+        }
+
+        private void HighlightEligibleTiles()
+        {
             foreach (var kvp in HexManager.PlacedTiles)
             {
-                Renderer rend = kvp.Value.GetComponentInChildren<Renderer>();
+                if (!kvp.Value) continue;
+
+                var tile = kvp.Value.GetComponent<HexTile>();
+                var rend = kvp.Value.GetComponentInChildren<Renderer>();
+
+                if (tile == null || rend == null) continue;
+
+                if (tile.HasBuilding)
+                {
+                    rend.material = RedHighlightMaterial;
+                }
+                else
+                {
+                    rend.material = GreenHighlightMaterial;
+                    _highlightedTiles.Add(tile);
+                }
+            }
+        }
+
+        private void RestoreTileMaterials()
+        {
+            foreach (var kvp in HexManager.PlacedTiles)
+            {
+                if (!kvp.Value) continue;
+
+                var rend = kvp.Value.GetComponentInChildren<Renderer>();
                 if (rend != null)
                 {
                     rend.material = DefaultMaterial;
                 }
             }
-
-            _highlightedTiles.Clear();
-
-            ServiceLocator.Instance.Get<GameManager>().SwitchToIsland();
-            ServiceLocator.Instance.Get<ClickRouter>()?.ClearClickHandler();
-
-
         }
-    
-        public void HandleBuildClick(Vector2 screenPosition)
+
+        private void HandleBuildClick(Vector2 screenPosition)
         {
             if (Camera.main == null) return;
-        
-            Ray ray = Camera.main.ScreenPointToRay(screenPosition);
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+            if (!Physics.Raycast(ray, out RaycastHit hit)) return;
+
+            HexTile clickedTile = hit.collider.GetComponentInParent<HexTile>();
+            if (clickedTile != null && !clickedTile.HasBuilding && _highlightedTiles.Contains(clickedTile))
             {
-                Debug.Log($"[BuildManager] Hit: {hit.collider.gameObject.name}"); // 🔥
-        
-                HexTile clickedTile = hit.collider.GetComponentInParent<HexTile>();
-                if (clickedTile != null && !clickedTile.HasBuilding && _highlightedTiles.Contains(clickedTile))
-                {
-                    ReplaceWithFarm(clickedTile);
-                }
+                ReplaceWithFarm(clickedTile);
             }
             else
             {
-                Debug.LogWarning("[BuildManager] No Raycast hit detected."); // 🔥
+                Debug.LogWarning("[BuildManager] Clicked an invalid or occupied tile.");
             }
         }
 
+        private void HandleCancelBuild()
+        {
+            Debug.Log("[BuildManager] Build mode canceled via Right Click.");
+            ExitBuildMode();
+        }
 
+        private void ReplaceWithFarm(HexTile tile)
+        {
+            if (tile == null) return;
 
+            // 1. Mark the tile logically
+            tile.HasBuilding = true;
+            tile.TileType = TileType.Grass; // You can define a TileType.Farm if needed
+
+            // 2. Destroy old visuals
+            foreach (Transform child in tile.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // 3. Instantiate new visual prefab under tile
+            GameObject newVisual = Instantiate(FarmHexPrefab, tile.transform);
+            newVisual.transform.localPosition = Vector3.zero;
+            newVisual.transform.localRotation = Quaternion.identity;
+            newVisual.transform.localScale = Vector3.one;
+
+            // 4. Play spawn animation if available
+            var spawnAnimator = newVisual.GetComponent<HexSpawnAnimator>();
+            if (spawnAnimator != null)
+            {
+                spawnAnimator.PlaySpawnAnimation();
+            }
+
+            Debug.Log($"[BuildManager] Replaced tile at {tile.GridPosition} with farm.");
+
+            ExitBuildMode();
+        }
     }
 }

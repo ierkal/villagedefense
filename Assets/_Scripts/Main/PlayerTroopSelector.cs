@@ -29,20 +29,9 @@ namespace _Scripts.Main
             _inputHandler = ServiceLocator.Instance.Get<PlayerInputHandler>();
             _contextManager = ServiceLocator.Instance.Get<InputContextManager>();
 
-            _inputHandler.OnClick += HandleClick;
-            _inputHandler.OnCancel += CancelSelection;
         }
 
-        private void OnDestroy()
-        {
-            if (_inputHandler != null)
-            {
-                _inputHandler.OnClick -= HandleClick;
-                _inputHandler.OnCancel -= CancelSelection;
-            }
-        }
-
-        private void HandleClick(Vector2 screenPos)
+        /*private void HandleClick(Vector2 screenPos)
         {
             if (_awaitingMoveTarget)
             {
@@ -74,7 +63,7 @@ namespace _Scripts.Main
                     Log.Info(this, "Troop selected, waiting for destination tile.", "cyan");
                 }
             }
-        }
+        }*/
 
         private void CancelSelection()
         {
@@ -84,7 +73,9 @@ namespace _Scripts.Main
             _awaitingMoveTarget = false;
 
             Time.timeScale = 1f;
+            /*
             _contextManager.EnableGameplayControls();
+        */
         }
 
         private void IssueFormationMove(Vector3 center)

@@ -1,31 +1,32 @@
+using _Scripts.Input;
 using _Scripts.Island;
+using _Scripts.Main.Services;
 using _Scripts.OdinAttributes;
-using UnityEngine;
+using _Scripts.StateMachine.Interface;
+using _Scripts.Utility;
 
-namespace _Scripts.StateMachine.Interface
+[LogTag("BuildingState")]
+public class BuildingState : BaseGameState
 {
-    [LogTag("BuildingState")]
-    public class BuildingState : BaseGameState
+    private readonly BuildManager _buildManager;
+
+    public BuildingState(BuildManager buildManager)
     {
-        private readonly BuildManager _buildManager;
-
-        public BuildingState(BuildManager buildManager)
-        {
-            _buildManager = buildManager;
-        }
-
-        public override void Enter()
-        {
-            base.Enter();
-            /*_buildManager.EnableBuildMode();*/
-        }
-
-        public override void Exit()
-        {
-            /*_buildManager.DisableBuildMode();*/
-            base.Exit();
-        }
-
-        public override void Tick() { }
+        _buildManager = buildManager;
     }
+
+    public override void Enter()
+    {
+        base.Enter();
+        
+
+    }
+
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    public override void Tick() { }
 }

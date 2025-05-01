@@ -27,7 +27,14 @@ namespace _Scripts.Island
 
         }
 
-        private void Start()
+        /*private void Start()
+        {
+            if (_spawnParticlePrefab != null)
+                Instantiate(_spawnParticlePrefab, transform.position, Quaternion.identity, transform);
+
+            StartCoroutine(AnimateHexGrow());
+        }*/
+        public void PlaySpawnAnimation()
         {
             if (_spawnParticlePrefab != null)
                 Instantiate(_spawnParticlePrefab, transform.position, Quaternion.identity, transform);

@@ -16,13 +16,11 @@ namespace _Scripts.AI.Player.FSM
 
         public void Enter()
         {
-            _troop.SetAttacking(true);
             _lastAttackTime = Time.time;
         }
 
         public void Exit()
         {
-            _troop.SetAttacking(false);
         }
 
         public void Tick()
@@ -41,8 +39,8 @@ namespace _Scripts.AI.Player.FSM
 
             if (Time.time >= _lastAttackTime + _attackCooldown)
             {
-                _troop.PerformAttack();
-                _troop.SetAttacking(true);
+                /*_troop.PerformAttack();
+                _troop.SetAttacking();*/
                 _lastAttackTime = Time.time;
             }
         }

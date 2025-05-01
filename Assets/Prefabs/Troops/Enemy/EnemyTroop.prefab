@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6874967664804405394}
   - component: {fileID: 151838767094550072}
   - component: {fileID: 5369505023902748002}
+  - component: {fileID: 4934480663834907987}
   m_Layer: 0
   m_Name: EnemyTroop
   m_TagString: Untagged
@@ -48,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a639cba6b344de9a49020404a6a1418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animator: {fileID: 0}
+  _animators: []
 --- !u!114 &7331534160823432445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,3 +101,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f0ecedda9a4f8981874d65df1552e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4934480663834907987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6032678671047424110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb500918f8c14f81aae11107380851fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _visualPrefabs:
+  - {fileID: 3108494894785037043, guid: 95939b1c14d6bb842b8f22af11fb60c3, type: 3}
+  _unitCount: 3
+  _spacing: 0.4

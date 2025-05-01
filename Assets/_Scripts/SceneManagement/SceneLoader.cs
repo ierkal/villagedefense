@@ -102,7 +102,9 @@ namespace _Scripts.SceneManagement
             yield return SceneManager.LoadSceneAsync(sceneData.SceneName, ConvertLoadMode(sceneData.LoadMode));
 
             yield return null;
+            /*
             _overlayUI?.HideLoadingAnimation();
+        */
         }
         private LoadSceneMode ConvertLoadMode(SceneLoadMode mode)
         {

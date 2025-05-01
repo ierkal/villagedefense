@@ -16,13 +16,13 @@ namespace _Scripts.AI.Enemies.FSM
 
         public void Enter()
         {
-            _troop.SetAttacking(true);
+            _troop.SetAttacking();
             _lastAttackTime = Time.time;
         }
 
         public void Exit()
         {
-            _troop.SetAttacking(false);
+            _troop.SetAttacking();
         }
 
         public void Tick()
@@ -43,7 +43,7 @@ namespace _Scripts.AI.Enemies.FSM
             {
                 _troop.PerformAttack(); // Implement this on your AI
                 _lastAttackTime = Time.time;
-                _troop.SetAttacking(true);
+                _troop.SetAttacking();
             }
         }
     }

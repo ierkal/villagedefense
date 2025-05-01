@@ -22,31 +22,51 @@ namespace _Scripts.AI.Core
             StateMachine.Tick();
         }
 
-        // --- Animation Hooks ---
+        #region Animation Hooks
 
-        /// <summary>Set movement speed for run/idle blend.</summary>
+        /// <summary>
+        /// Immediately sets movement speed for walk/run blend tree.
+        /// Use this if precision is more important than smoothness.
+        /// </summary>
         public void SetMovementSpeed(float speed)
         {
             _anim.SetMovementSpeed(speed);
         }
 
-        /// <summary>Start or stop attack loop.</summary>
-        public void SetAttacking(bool isAttacking)
+        /// <summary>
+        /// Smoothly sets movement speed using animator damping for better transitions.
+        /// </summary>
+        public void SetMovementSpeedSmooth(float speed, float damping = 0.2f)
         {
-            _anim.PlayAttack(isAttacking);
+            _anim.SetMovementSpeed(speed, damping);
         }
 
-        /// <summary>Play death animation.</summary>
+        /// <summary>
+        /// Triggers attack animation. One-shot trigger, does not loop.
+        /// </summary>
+        public void SetAttacking()
+        {
+            _anim.PlayAttack();
+        }
+
+        /// <summary>
+        /// Triggers death animation and sets IsDead flag.
+        /// </summary>
         public void PlayDeath()
         {
             _anim.Die();
         }
 
-        // --- Abstract logic to be defined by derived AI ---
+        #endregion
+
+        #region Abstract Combat Logic
+
         public abstract bool HasTarget();
         public abstract bool TargetIsDead();
         public abstract bool IsInAttackRange();
         public abstract void MoveToTarget();
         public abstract void PerformAttack();
+
+        #endregion
     }
 }

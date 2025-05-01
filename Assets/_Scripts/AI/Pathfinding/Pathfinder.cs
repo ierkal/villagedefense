@@ -9,50 +9,82 @@ namespace _Scripts.AI.Core
     {
         public static List<HexTile> FindPath(HexTile startTile, HexTile targetTile)
         {
-            Queue<HexTile> frontier = new();
-            Dictionary<HexTile, HexTile> cameFrom = new();
-            HashSet<HexTile> visited = new();
+            var openSet = new List<HexTile> { startTile };
+            var cameFrom = new Dictionary<HexTile, HexTile>();
+            var gScore = new Dictionary<HexTile, float>();
+            var fScore = new Dictionary<HexTile, float>();
 
-            frontier.Enqueue(startTile);
-            visited.Add(startTile);
+            gScore[startTile] = 0f;
+            fScore[startTile] = Heuristic(startTile, targetTile);
 
-            while (frontier.Count > 0)
+            while (openSet.Count > 0)
             {
-                HexTile current = frontier.Dequeue();
+                HexTile current = GetTileWithLowestFScore(openSet, fScore);
 
                 if (current == targetTile)
-                    break;
+                    return ReconstructPath(cameFrom, current);
+
+                openSet.Remove(current);
 
                 foreach (HexTile neighbor in GetWalkableNeighbors(current))
                 {
-                    if (!visited.Contains(neighbor))
+                    float tentativeG = gScore[current] + Distance(current, neighbor);
+
+                    if (!gScore.ContainsKey(neighbor) || tentativeG < gScore[neighbor])
                     {
-                        frontier.Enqueue(neighbor);
-                        visited.Add(neighbor);
                         cameFrom[neighbor] = current;
+                        gScore[neighbor] = tentativeG;
+                        fScore[neighbor] = tentativeG + Heuristic(neighbor, targetTile);
+
+                        if (!openSet.Contains(neighbor))
+                            openSet.Add(neighbor);
                     }
                 }
             }
 
-            // Reconstruct path
-            List<HexTile> path = new();
-            HexTile step = targetTile;
+            Debug.LogWarning("A* Path not found!");
+            return new List<HexTile>();
+        }
 
-            while (step != startTile)
+        private static HexTile GetTileWithLowestFScore(List<HexTile> openSet, Dictionary<HexTile, float> fScore)
+        {
+            HexTile bestTile = null;
+            float bestScore = float.MaxValue;
+
+            foreach (var tile in openSet)
             {
-                if (!cameFrom.ContainsKey(step))
+                if (fScore.TryGetValue(tile, out float score) && score < bestScore)
                 {
-                    Debug.LogWarning("Path not found!");
-                    return new List<HexTile>();
+                    bestScore = score;
+                    bestTile = tile;
                 }
-
-                path.Add(step);
-                step = cameFrom[step];
             }
 
-            path.Add(startTile);
+            return bestTile;
+        }
+
+        private static List<HexTile> ReconstructPath(Dictionary<HexTile, HexTile> cameFrom, HexTile current)
+        {
+            List<HexTile> path = new();
+
+            while (cameFrom.ContainsKey(current))
+            {
+                path.Add(current);
+                current = cameFrom[current];
+            }
+
             path.Reverse();
             return path;
+        }
+
+        private static float Heuristic(HexTile a, HexTile b)
+        {
+            return Mathf.Abs(a.GridPosition.x - b.GridPosition.x) + Mathf.Abs(a.GridPosition.y - b.GridPosition.y);
+        }
+
+        private static float Distance(HexTile a, HexTile b)
+        {
+            return 1f; // All tiles are equal distance unless you add cost later
         }
 
         private static List<HexTile> GetWalkableNeighbors(HexTile tile)

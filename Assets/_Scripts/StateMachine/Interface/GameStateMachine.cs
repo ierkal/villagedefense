@@ -10,8 +10,10 @@ namespace _Scripts.StateMachine.Interface
 
         public void PushState(IGameState newState)
         {
-            CurrentState?.Exit(); // pause current
+            CurrentState?.Exit();
             _stateStack.Push(newState);
+            if (newState is BaseGameState baseState)
+                baseState.SetStateMachine(this);
             newState.Enter();
         }
 
@@ -29,8 +31,9 @@ namespace _Scripts.StateMachine.Interface
             {
                 _stateStack.Pop().Exit();
             }
-
             _stateStack.Push(newState);
+            if (newState is BaseGameState baseState)
+                baseState.SetStateMachine(this);
             newState.Enter();
         }
 

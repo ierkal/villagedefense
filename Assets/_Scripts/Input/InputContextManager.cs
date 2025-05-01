@@ -1,50 +1,45 @@
-﻿using _Scripts.Event;
+﻿using System;
+using _Scripts.Input;
 using _Scripts.Main.Services;
-using _Scripts.OdinAttributes;
-using _Scripts.Utility;
 using UnityEngine;
 
-namespace _Scripts.Input
+public class InputContextManager : MonoBehaviour, IGameService
 {
-    [LogTag("InputContextManager")]
-    public class InputContextManager : MonoBehaviour, IGameService
+    private PlayerInputHandler _inputHandler;
+
+    private void Awake()
     {
-        private PlayerInputHandler _inputHandler;
+        _inputHandler = ServiceLocator.Instance.Get<PlayerInputHandler>();
+    }
 
-        private void OnEnable()
-        {
-            EventBroker.Instance.AddEventListener<ServicesInitializedEvent>(OnServicesInitialized);
-        }
+    private void Start()
+    {
+        EnableGameplayControls();
+    }
 
-        private void OnDisable()
-        {
-            EventBroker.Instance.RemoveEventListener<ServicesInitializedEvent>(OnServicesInitialized);
-        }
+    public void EnableGameplayControls()
+    {
+        _inputHandler.InputActions.Gameplay.Enable();
+        Debug.Log("[InputContextManager] Gameplay Controls Enabled");
+    }
 
-        private void OnServicesInitialized(ServicesInitializedEvent e)
-        {
-            _inputHandler = ServiceLocator.Instance.Get<PlayerInputHandler>();
-        }
+    public void EnableBuildControls()
+    {
+        DisableAll();
+        _inputHandler.InputActions.Building.Enable();
+        Debug.Log("[InputContextManager] Build Controls Enabled");
+    }
 
-        public void EnableGameplayControls()
-        {
-            _inputHandler.InputActions.UI.Disable();
-            _inputHandler.InputActions.Gameplay.Enable();
-            Log.Info(this, "Gameplay controls enabled", "green");
-        }
+    public void EnableUnitControls()
+    {
+        DisableAll();
+        _inputHandler.InputActions.UnitCommand.Enable();
+        Debug.Log("[InputContextManager] UnitCommand Controls Enabled");
+    }
 
-        public void EnableUIControls()
-        {
-            _inputHandler.InputActions.Gameplay.Disable();
-            _inputHandler.InputActions.UI.Enable();
-            Log.Info(this, "UI controls enabled", "magenta");
-        }
-
-        public void DisableAllControls()
-        {
-            _inputHandler.InputActions.Gameplay.Disable();
-            _inputHandler.InputActions.UI.Disable();
-            Log.Info(this, "All controls disabled", "yellow");
-        }
+    private void DisableAll()
+    {
+        _inputHandler.InputActions.Building.Disable();
+        _inputHandler.InputActions.UnitCommand.Disable();
     }
 }

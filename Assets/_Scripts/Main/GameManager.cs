@@ -1,9 +1,11 @@
+using _Scripts.AI;
 using _Scripts.Event;
 using _Scripts.Input;
 using _Scripts.Island;
 using _Scripts.Main.Services;
 using _Scripts.OdinAttributes;
 using _Scripts.StateMachine.Interface;
+using _Scripts.StateMachine.States;
 using _Scripts.Utility;
 using UnityEngine;
 
@@ -25,7 +27,7 @@ namespace _Scripts.Main
 
         private void Start()
         {
-            _gameplayStateMachine.SetState(new IslandState());
+            _gameplayStateMachine.SetState(new LoadingState());
         }
 
         private void Update()
@@ -59,5 +61,17 @@ namespace _Scripts.Main
             Log.Warning(this, "Switching to GameOverState", "magenta");
             _gameplayStateMachine.SetState(new GameOverState());
         }
+        public void SwitchToUnitCommand(Vector2 clickPos)
+        {
+            var unitCommandHandler = ServiceLocator.Instance.Get<UnitCommandHandler>();
+
+            Log.Warning(this,"Switching to UnitCommandState", "cyan");
+
+            unitCommandHandler.EnterUnitCommandMode();
+            unitCommandHandler.HandleUnitClick(clickPos); // 🔥 Forward the click
+        }
+
+
+
     }
 }

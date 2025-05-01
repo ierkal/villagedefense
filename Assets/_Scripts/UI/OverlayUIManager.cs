@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using _Scripts.Main.Services;
 
 namespace _Scripts.UI
 {
-    public class OverlayUIManager : MonoBehaviour
+    public class OverlayUIManager : MonoBehaviour, IGameService
     {
         [SerializeField] private CanvasGroup _loadingCanvasGroup;
         [SerializeField] private float _fadeDuration = 0.5f;

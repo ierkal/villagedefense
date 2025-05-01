@@ -46,5 +46,17 @@ namespace _Scripts.Main.Services
         {
             return _services.ContainsKey(type);
         }
+        public bool TryGet<T>(out T service) where T : class
+        {
+            if (_services.TryGetValue(typeof(T), out var instance))
+            {
+                service = instance as T;
+                return true;
+            }
+
+            service = null;
+            return false;
+        }
+
     }
 }
