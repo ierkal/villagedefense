@@ -12,21 +12,18 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _CAUSTICS
   - _ENVIRONMENTREFLECTIONS_OFF
   - _INTERSECTION_FOAM
   - _NORMALMAP
   - _RECEIVE_SHADOWS_OFF
-  - _REFRACTION
   - _SPECULARHIGHLIGHTS_OFF
   - _SURFACE_FOAM_SINGLE
-  - _TRANSLUCENCY
-  - _WAVES
   m_InvalidKeywords:
   - _CROSSPAN_INTERSECTION
   - _DEPTHEXP_ON
   - _DEPTH_TEX
   - _FOAMON_ON
+  - _INTERSECTIONSHARP_ON
   - _RECEIVEDYNAMICEFFECTSFOAM_ON
   - _RECEIVEDYNAMICEFFECTSHEIGHT_ON
   - _RECEIVEDYNAMICEFFECTSNORMAL_ON
@@ -132,19 +129,19 @@ Material:
     - _CausticsBrightness: 2
     - _CausticsChromance: 1
     - _CausticsDistortion: 1
-    - _CausticsOn: 1
+    - _CausticsOn: 0
     - _CausticsSpeed: 0.1
     - _CausticsTiling: 0.5
     - _ColorAbsorption: 0
     - _CrossPan_IntersectionOn: 1
-    - _Cull: 0
+    - _Cull: 2
     - _Cutoff: 0.5
     - _Depth: 2.45
     - _DepthExp: 1
     - _DepthHorizontal: 2.44
     - _DepthMode: 0
     - _DepthTexture: 1
-    - _DepthVertical: 4.2
+    - _DepthVertical: 2.29
     - _DisableDepthTexture: 0
     - _DistanceFoamTiling: 0.2
     - _DistanceNormalsOn: 0
@@ -176,20 +173,20 @@ Material:
     - _FoamWaveAmount: 0
     - _FoamWaveMask: 1
     - _FoamWaveMaskExp: 1
-    - _FogSource: 0
+    - _FogSource: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _HorizonDistance: 2
-    - _IntersectionClipping: 0.361
+    - _IntersectionClipping: 0.01
     - _IntersectionDistortion: 0.246
-    - _IntersectionFalloff: 0.01
+    - _IntersectionFalloff: 0.07
     - _IntersectionFoamOn: 1
-    - _IntersectionLength: 1.95
+    - _IntersectionLength: 1.1
     - _IntersectionRippleDist: 1
     - _IntersectionRippleSpeed: 2
     - _IntersectionRippleStrength: 0.109
-    - _IntersectionSharp: 0
+    - _IntersectionSharp: 1
     - _IntersectionSource: 0
     - _IntersectionSpeed: 0.1
     - _IntersectionStyle: 1
@@ -220,7 +217,7 @@ Material:
     - _ReflectionLighting: 0
     - _ReflectionStrength: 1
     - _RefractionChromaticAberration: 1
-    - _RefractionOn: 1
+    - _RefractionOn: 0
     - _RefractionStrength: 0.118
     - _RiverModeOn: 0
     - _SHARP_INERSECTIONOn: 1
@@ -256,7 +253,7 @@ Material:
     - _Translucency: 1
     - _TranslucencyCurvatureMask: 1
     - _TranslucencyExp: 6.6
-    - _TranslucencyOn: 1
+    - _TranslucencyOn: 0
     - _TranslucencyReflectionMask: 0
     - _TranslucencyStrength: 1.05
     - _TranslucencyStrengthDirect: 0.011
@@ -273,7 +270,7 @@ Material:
     - _WaveSpeed: 0.38999993
     - _WaveSteepness: 5
     - _WaveTint: 0
-    - _WavesOn: 1
+    - _WavesOn: 0
     - _WorkflowMode: 1
     - _WorldSpaceUV: 1
     - _ZClip: 1

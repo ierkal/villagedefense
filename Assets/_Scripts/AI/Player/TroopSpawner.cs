@@ -4,6 +4,8 @@ using _Scripts.Utility;
 using _Scripts.OdinAttributes;
 using _Scripts.Island;
 using _Scripts.AI.Player;
+using _Scripts.AI.Visuals;
+using _Scripts.Data;
 
 namespace _Scripts.AI.Player
 {
@@ -11,39 +13,71 @@ namespace _Scripts.AI.Player
     public class TroopSpawner : MonoBehaviour, IGameService
     {
         [Header("Troop Spawning Settings")]
-        [SerializeField] private GameObject _troopPrefab; // Prefab with PlayerTroopAI + TroopVisualPack
+        [SerializeField] private TroopPackData _troopPack;
         [SerializeField] private Transform _spawnParent;
         [SerializeField] private float _spawnOffsetY = 0.1f;
 
-        public void SpawnStartingUnit(Vector3 spawnPosition)
+        private bool _hasSpawnedStartingUnit = false;
+
+        private void Start()
         {
-            if (_troopPrefab == null)
+            var hexManager = ServiceLocator.Instance.Get<HexagonManager>();
+            hexManager.OnIslandReady += TrySpawnStartingUnit;
+        }
+
+        private void OnDestroy()
+        {
+            var hexManager = ServiceLocator.Instance.Get<HexagonManager>();
+            if (hexManager != null)
+                hexManager.OnIslandReady -= TrySpawnStartingUnit;
+        }
+
+        public void TrySpawnStartingUnit()
+        {
+            if (_hasSpawnedStartingUnit || _troopPack == null || _troopPack.LogicPrefab == null)
             {
-                Log.Error(this, "Troop prefab not assigned!");
+                Log.Warning(this, "Troop spawn skipped: already spawned or pack missing.");
                 return;
             }
 
             var hexManager = ServiceLocator.Instance.Get<HexagonManager>();
-            var closestTile = hexManager.GetClosestHexTile(spawnPosition);
+            var spawnTile = hexManager.GetClosestHexTile(Vector3.zero);
 
-            if (closestTile == null)
+            if (spawnTile == null)
             {
                 Log.Warning(this, "No valid tile found near spawn position!");
                 return;
             }
 
-            Vector3 adjustedPosition = closestTile.transform.position + Vector3.up * _spawnOffsetY;
+            SpawnUnit(spawnTile);
+            _hasSpawnedStartingUnit = true;
+        }
 
-            GameObject unitGO = Instantiate(_troopPrefab, adjustedPosition, Quaternion.identity, _spawnParent);
-
-            if (unitGO.TryGetComponent<PlayerTroopAI>(out var troopAI))
+        public void SpawnUnit(HexTile targetTile)
+        {
+            if (_troopPack == null || _troopPack.LogicPrefab == null || targetTile == null)
             {
-                troopAI.CurrentTile = closestTile;
-                Log.Info(this, $"Spawned troop at tile {closestTile.GridPosition}.");
+                Log.Error(this, "Cannot spawn unit. Missing pack, logic prefab, or tile.");
+                return;
             }
+
+            Vector3 adjustedPosition = targetTile.transform.position + Vector3.up * _spawnOffsetY;
+            GameObject logicGO = Instantiate(_troopPack.LogicPrefab, adjustedPosition, Quaternion.identity, _spawnParent);
+
+            if (logicGO.TryGetComponent<PlayerTroopAI>(out var troopAI))
+            {
+                troopAI.CurrentTile = targetTile;
+
+                var visualPack = logicGO.GetComponentInChildren<TroopVisualPack>(true);
+                if (visualPack != null)
+                    visualPack.SetPackData(_troopPack);
+
+                Log.Info(this, $"Spawned troop at tile {targetTile.GridPosition}.");
+            }
+
             else
             {
-                Log.Warning(this, "Spawned object is missing PlayerTroopAI component!");
+                Log.Warning(this, "Spawned unit missing PlayerTroopAI component.");
             }
         }
     }

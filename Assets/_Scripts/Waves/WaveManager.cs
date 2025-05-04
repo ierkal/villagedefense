@@ -18,6 +18,8 @@ namespace _Scripts.Waves
         [Header("Wave Settings")]
         [SerializeField] private float _spawnInterval = 1f;
         [SerializeField] private float _spawnOffsetDistance = 2f;
+        [SerializeField] private float _waveCountdown = 3f;
+        [SerializeField] private GameObject _startWaveButton;
 
         private HexagonManager _hexManager;
         private GameManager _gameManager;
@@ -36,6 +38,9 @@ namespace _Scripts.Waves
             _enemySpawner = ServiceLocator.Instance.Get<EnemySpawner>();
 
             EventBroker.Instance.AddEventListener<EnemyDiedEvent>(OnEnemyDied);
+
+            if (_startWaveButton != null)
+                _startWaveButton.SetActive(true); // Show on start (or you can set false initially)
         }
 
         private void OnDestroy()
@@ -51,6 +56,8 @@ namespace _Scripts.Waves
                 return;
             }
 
+            _startWaveButton?.SetActive(false);
+
             _currentWave++;
             Log.Info(this, $"Starting wave {_currentWave}", "red");
 
@@ -63,36 +70,38 @@ namespace _Scripts.Waves
 
         private IEnumerator SpawnWaveRoutine()
         {
+            yield return new WaitForSeconds(_waveCountdown);
+
             _activeEnemies.Clear();
 
-            int enemyCount = 1; // simple scaling
-
-            for (int i = 0; i < enemyCount; i++)
-            {
-                SpawnOneShipWithTroops();
-                yield return new WaitForSeconds(_spawnInterval);
-            }
-
-            Log.Info(this, $"All enemy ships spawned for wave {_currentWave}.", "yellow");
-        }
-
-        private void SpawnOneShipWithTroops()
-        {
+            int enemyCount = GetEnemyCountForWave(_currentWave);
             List<Vector3> edgeSpawns = _hexManager.GetEdgeSpawnPositions(_spawnOffsetDistance);
 
             if (edgeSpawns.Count == 0)
             {
                 Log.Warning(this, "No valid edge spawn positions.");
-                return;
+                yield break;
             }
 
-            Vector3 spawnPos = edgeSpawns[Random.Range(0, edgeSpawns.Count)];
-            HexTile closestTile = _hexManager.GetClosestHexTile(spawnPos);
+            for (int i = 0; i < enemyCount; i++)
+            {
+                Vector3 spawnPos = edgeSpawns[i % edgeSpawns.Count];
+                HexTile closestTile = _hexManager.GetClosestHexTile(spawnPos);
 
-            // 💥 Spawn ship via EnemySpawner
-            GameObject ship = _enemySpawner.SpawnShipAt(spawnPos, closestTile);
+                GameObject ship = _enemySpawner.SpawnShipAt(spawnPos, closestTile);
+                Log.Info(this, $"Spawned ship toward tile {closestTile.GridPosition}", "cyan");
 
-            Log.Info(this, $"Spawned ship toward tile {closestTile.GridPosition}", "cyan");
+                yield return new WaitForSeconds(_spawnInterval);
+            }
+
+            Log.Info(this, $"All enemies spawned for wave {_currentWave}.", "yellow");
+        }
+
+        private int GetEnemyCountForWave(int wave)
+        {
+            int baseEnemies = 2;
+            float growthRate = 0.5f;
+            return baseEnemies + Mathf.FloorToInt(wave * growthRate);
         }
 
         private void OnEnemyDied(EnemyDiedEvent e)
@@ -127,6 +136,8 @@ namespace _Scripts.Waves
             Log.Info(this, $"Wave {_currentWave} completed. All enemies defeated.", "green");
             new WaveEndedEvent(_currentWave).Raise();
             _gameManager.SwitchToIsland();
+
+            _startWaveButton?.SetActive(true);
         }
     }
 }

@@ -11,8 +11,8 @@ namespace _Scripts.Utility
 {
     public class TileHighlightVisualizer : MonoBehaviour, IGameService
     {
-        [Header("Hover Marker")]
-        [SerializeField] private GameObject _hoverMarkerPrefab;
+        [Header("Hover Marker")] [SerializeField]
+        private GameObject _hoverMarkerPrefab;
 
         [SerializeField] private float _hoverYOffset = 1.2f; // ✅ Higher to appear above units/objects
 
@@ -25,7 +25,6 @@ namespace _Scripts.Utility
         private void Awake()
         {
             _mmfPlayer = GetComponentInChildren<MMF_Player>(true);
-
         }
 
         public void SetSelectedUnit(PlayerTroopAI unit)
@@ -54,11 +53,16 @@ namespace _Scripts.Utility
             }
 
             List<HexTile> path = Pathfinder.FindPath(currentTile, tile);
-            if (path == null || path.Count == 0)
+
+// Allow empty path only if it's the same tile (for re-centering)
+            bool isSameTile = currentTile == tile;
+
+            if ((path == null || path.Count == 0) && !isSameTile)
             {
                 Clear();
                 return;
             }
+
 
             _lastHovered = tile;
             Vector3 hoverPos = tile.transform.position + new Vector3(0f, _hoverYOffset, 0f);
@@ -76,8 +80,8 @@ namespace _Scripts.Utility
 
             if (_mmfPlayer != null)
             {
-                _mmfPlayer.StopFeedbacks();  // Stop previous loop if any
-                _mmfPlayer.PlayFeedbacks();  // Play again
+                _mmfPlayer.StopFeedbacks(); // Stop previous loop if any
+                _mmfPlayer.PlayFeedbacks(); // Play again
             }
         }
 

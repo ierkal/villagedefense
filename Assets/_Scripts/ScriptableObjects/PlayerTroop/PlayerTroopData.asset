@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5a4e358053d4589a9efab5ada7144cb, type: 3}
-  m_Name: EnemyTroopPack
+  m_Name: PlayerTroopData
   m_EditorClassIdentifier: 
-  LogicPrefab: {fileID: 7280098821834459934, guid: 818b1fb237a4dca4598a0a3d146118f5, type: 3}
+  LogicPrefab: {fileID: 1996286759491869183, guid: bfc25c194ff55fe449d52a89dc6a8691, type: 3}
   VisualPrefabs:
-  - {fileID: 3108494894785037043, guid: 95939b1c14d6bb842b8f22af11fb60c3, type: 3}
+  - {fileID: 405257443060912407, guid: abe487ac6900ec14d91eca7bd42e6a5f, type: 3}
   TroopCount: 3
   DisembarkDelay: 0.2

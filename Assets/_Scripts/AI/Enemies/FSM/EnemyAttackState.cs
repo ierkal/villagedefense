@@ -16,8 +16,8 @@ namespace _Scripts.AI.Enemies.FSM
 
         public void Enter()
         {
-            _troop.SetAttacking();
             _lastAttackTime = Time.time;
+            _troop.SetAttacking();
         }
 
         public void Exit()
@@ -29,7 +29,7 @@ namespace _Scripts.AI.Enemies.FSM
         {
             if (_troop.TargetIsDead())
             {
-                _troop.StateMachine.SetState(new InvadeTileState(_troop)); // Return to roam
+                _troop.StateMachine.SetState(new InvadeTileState(_troop));
                 return;
             }
 
@@ -41,7 +41,7 @@ namespace _Scripts.AI.Enemies.FSM
 
             if (Time.time >= _lastAttackTime + _attackCooldown)
             {
-                _troop.PerformAttack(); // Implement this on your AI
+                _troop.PerformAttack();
                 _lastAttackTime = Time.time;
                 _troop.SetAttacking();
             }

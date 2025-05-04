@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using _Scripts.AI.Player;
 using _Scripts.Island;
+using _Scripts.Main.Services;
 using _Scripts.OdinAttributes;
 using _Scripts.Utility;
 using UnityEngine;
@@ -46,6 +47,10 @@ namespace _Scripts.AI.Core
 
             MoveTowardsCurrentTarget();
         }
+        public void SetSpeed(float speed)
+        {
+            _moveSpeed = speed;
+        }
 
         private void MoveTowardsCurrentTarget()
         {
@@ -67,30 +72,28 @@ namespace _Scripts.AI.Core
             float distance = Vector3.Distance(transform.position, targetPos);
             if (distance <= _arrivalThreshold)
             {
-                // ✅ First: if reached tile, update troop's CurrentTile immediately
-                if (TryGetComponent<PlayerTroopAI>(out var troop))
+                // ✅ Set CurrentTile for both player and enemy troops
+                if (TryGetComponent<BaseTroopAI>(out var troop))
                 {
                     troop.CurrentTile = targetTile;
                 }
 
-                // ✅ Second: move to next tile
+                // ✅ Move to next tile
                 _currentIndex++;
 
-                // ✅ Third: check if movement is complete
+                // ✅ Check if movement is complete
                 if (_currentIndex >= _path.Count)
                 {
                     _isMoving = false;
 
-                    // ✅ Now safe to snap + invoke
-                    if (TryGetComponent<PlayerTroopAI>(out var t))
-                    {
-                        t.SnapToTile(); // Center perfectly
-                    }
+                    // ✅ Snap to tile (optional, can make this troop.SnapToTile() later if you want)
+                    transform.position = targetTile.transform.position;
 
                     Log.Info(this, "Movement complete.");
-                    OnMovementComplete?.Invoke(); // ✅ Safe now
+                    OnMovementComplete?.Invoke();
                 }
             }
+
 
 
 

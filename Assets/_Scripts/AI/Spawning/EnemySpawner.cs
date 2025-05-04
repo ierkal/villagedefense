@@ -33,7 +33,8 @@ namespace _Scripts.AI.Spawning
 
             GameObject prefab = _shipPrefabs[Random.Range(0, _shipPrefabs.Count)];
 
-            GameObject shipGO = Instantiate(prefab, spawnPosition, Quaternion.identity, _spawnParent);
+            Vector3 correctedSpawnPos = new Vector3(spawnPosition.x, 0.62f, spawnPosition.z);
+            GameObject shipGO = Instantiate(prefab, correctedSpawnPos, Quaternion.identity, _spawnParent);
 
             EnemyShip ship = shipGO.GetComponent<EnemyShip>();
             if (ship != null && targetTile != null)

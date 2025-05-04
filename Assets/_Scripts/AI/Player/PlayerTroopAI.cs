@@ -19,14 +19,14 @@ namespace _Scripts.AI.Player
         [Header("Settings")]
         [SerializeField] private float _moveSpeed = 2f;
         [SerializeField] private float _attackRange = 1.5f;
-
+        [SerializeField] private GameObject _selectionVisualPrefab;
+        private GameObject _selectionVisualInstance;
         public HexTile CurrentTile { get; set; }
         public bool IsSelected { get; private set; }
 
         private MovementOrder _movementOrder;
         private float _lastMoveIssuedTime;
 
-        private HexTile _currentTargetTile; // ✅ New logical marker
 
         protected override void Awake()
         {
@@ -59,7 +59,6 @@ namespace _Scripts.AI.Player
         {
             CurrentTile = ServiceLocator.Instance.Get<HexagonManager>().GetClosestHexTile(transform.position);
             Log.Info(this, $"Troop CurrentTile refreshed to {CurrentTile.GridPosition}");
-            _currentTargetTile = null; // ✅ Reached it
             StartCoroutine(FinishMovementAfterArrival());
         }
 
@@ -91,8 +90,6 @@ namespace _Scripts.AI.Player
                 return;
             }
 
-            // ✅ Save new reroute
-            _currentTargetTile = targetTile;
 
             // Cancel current movement and restart
             _movementOrder.StopMovement();
@@ -130,6 +127,7 @@ namespace _Scripts.AI.Player
             transform.position = CurrentTile.transform.position;
             Log.Info(this, $"Snapped to tile {CurrentTile.GridPosition}");
         }
+     
 
         public void EnterDefendMode(Transform threat)
         {
@@ -140,6 +138,26 @@ namespace _Scripts.AI.Player
         public void SetSelected(bool selected)
         {
             IsSelected = selected;
+
+            if (selected)
+            {
+                if (_selectionVisualInstance == null && _selectionVisualPrefab != null)
+                {
+                    _selectionVisualInstance = Instantiate(_selectionVisualPrefab, transform);
+                    _selectionVisualInstance.transform.localPosition = new Vector3(0,2.5f,0.45f); // Adjust Y if needed
+                }
+                else if (_selectionVisualInstance != null)
+                {
+                    _selectionVisualInstance.SetActive(true);
+                }
+            }
+            else
+            {
+                if (_selectionVisualInstance != null)
+                {
+                    _selectionVisualInstance.SetActive(false);
+                }
+            }
         }
 
         public override bool HasTarget() => Target != null;

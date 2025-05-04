@@ -78,7 +78,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   _moveSpeed: 2
   _attackRange: 1.5
-  moveMarkerPrefab: {fileID: 3827288791816570072, guid: cb53898b165d446af8014e2e9a9d1d0e, type: 3}
+  _selectionVisualPrefab: {fileID: 1833283917242425598, guid: 1135085023b7649a08479720855b5bef, type: 3}
 --- !u!136 &1120725177817212592
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1772a1a5a98f495ea31c2443cc6213ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSpeed: 2
+  _moveSpeed: 3
   _arrivalThreshold: 0.1
 --- !u!114 &-770750965901714844
 MonoBehaviour:
@@ -155,6 +155,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb500918f8c14f81aae11107380851fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _visualPrefabs: []
-  _unitCount: 3
+  PackData: {fileID: 11400000, guid: 4a65559c5927a4e42abc75cda608ce13, type: 2}
   _spacing: 0.8

@@ -14,6 +14,7 @@ namespace _Scripts.Input
         public System.Action OnPause;
         public System.Action OnRightClick;
         public System.Action<Vector2> OnClick;
+        public System.Action OnResetCamera;
 
         private void Awake()
         {
@@ -29,11 +30,15 @@ namespace _Scripts.Input
             /*
             _inputActions.Gameplay.Click.performed += _ => HandleClick();
             */
+            _inputActions.Gameplay.ResetCamera.performed += _ => OnResetCamera?.Invoke();
+
+            
             _inputActions.Building.Click.performed += _ => HandleClick();
             _inputActions.UnitCommand.Click.performed += _ => HandleClick();
 
             _inputActions.Building.RightClick.performed += _ => HandleRightClick();
             _inputActions.UnitCommand.RightClick.performed += _ => HandleRightClick();
+
             /*
             _inputActions.Gameplay.RightClick.performed += _ => HandleRightClick();
             */
@@ -46,6 +51,9 @@ namespace _Scripts.Input
             /*
             _inputActions.Gameplay.Click.performed -= _ => HandleClick();
             */
+            _inputActions.Gameplay.ResetCamera.performed -= _ => OnResetCamera?.Invoke();
+
+            
             _inputActions.Building.Click.performed -= _ => HandleClick();
             _inputActions.UnitCommand.Click.performed -= _ => HandleClick();
 

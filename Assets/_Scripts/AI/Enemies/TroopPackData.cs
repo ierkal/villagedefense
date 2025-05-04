@@ -1,17 +1,25 @@
 ﻿using UnityEngine;
 
-namespace _Scripts.AI.Enemies
+namespace _Scripts.Data
 {
-    [CreateAssetMenu(menuName = "Enemy/Troop Pack")]
+    [CreateAssetMenu(menuName = "Troops/Troop Pack")]
     public class TroopPackData : ScriptableObject
     {
-        [Tooltip("Enemy prefabs that will be spawned from this troop pack.")]
-        public GameObject[] TroopPrefabs;
+        [Header("Logic Prefab (PlayerTroopAI or EnemyTroopAI)")]
+        public GameObject LogicPrefab;
 
-        [Min(1), Tooltip("How many troops should disembark?")]
+        [Header("Visual Prefabs (for TroopVisualPack)")]
+        public GameObject[] VisualPrefabs;
+
+        [Min(1), Tooltip("How many troops in this pack?")]
         public int TroopCount = 3;
 
-        [Min(0.1f), Tooltip("Time delay between each disembark (seconds)")]
+        [Min(0.1f), Tooltip("Time delay between disembarks (for enemies)")]
         public float DisembarkDelay = 0.5f;
+        
+        [Header("Movement Settings")]
+        [Min(0.1f)]
+        public float MoveSpeed = 2f;
+
     }
 }

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using _Scripts.AI.Player;
+using _Scripts.Cameras;
+using _Scripts.Input;
 using _Scripts.Main.Services;
 using _Scripts.OdinAttributes;
 using _Scripts.UI;
@@ -13,25 +15,20 @@ namespace _Scripts.Island
     [LogTag("HexagonManager")]
     public class HexagonManager : MonoBehaviour, IGameService
     {
-        [Title("Hex Settings")]
-        public List<HexPrefabData> HexPrefabs = new();
+        [Title("Hex Settings")] public List<HexPrefabData> HexPrefabs = new();
 
-        [MinValue(0.1f)]
-        public float HexRadius = 1f;
+        [MinValue(0.1f)] public float HexRadius = 1f;
 
-        [PropertyRange(-10f, 10f)]
-        public float TileYPosition = 0.4f;
+        [PropertyRange(-10f, 10f)] public float TileYPosition = 0.4f;
 
-        [Required]
-        public Transform TileParent;
+        [Required] public Transform TileParent;
 
-        [Title("Island Generation")]
-        [MinValue(1)]
+        [Title("Island Generation")] [MinValue(1)]
         public int StartingTileCount = 10;
 
-        [ShowInInspector, ReadOnly]
-        private Dictionary<Vector2Int, GameObject> _placedTiles = new();
+        [ShowInInspector, ReadOnly] private Dictionary<Vector2Int, GameObject> _placedTiles = new();
         public Dictionary<Vector2Int, GameObject> PlacedTiles => _placedTiles;
+        public System.Action OnIslandReady;
 
         private void Start()
         {
@@ -49,14 +46,22 @@ namespace _Scripts.Island
 
             StartCoroutine(PlayAllTilesSpawnAnimationsStaggered()); // ✨ Play VFX only ONCE, after successful generation
             overlayUI?.HideLoadingAnimation(); // now show to player
-            /*
-            SpawnStartingTroop();
-            */
 
+            OnIslandReady?.Invoke();
+
+            var camera = ServiceLocator.Instance.Get<CameraOrbitController>();
+            if (camera != null)
+            {
+                camera.UpdateMaxZoomByTileCount(_placedTiles.Count);
+
+                GetIslandBounds(out Vector3 min, out Vector3 max);
+                camera.SetPanBounds(min, max);
+
+                var input = ServiceLocator.Instance.Get<PlayerInputHandler>();
+                input.OnResetCamera += () => camera.ResetCameraToCenter(GetIslandCenter());
+            }
         }
 
-
-        
         private IEnumerator GenerateUntilReady(System.Action onValidIsland)
         {
             do
@@ -64,10 +69,11 @@ namespace _Scripts.Island
                 GenerateConnectedRandomIsland();
 
                 HexTile playerStartTile = GetClosestHexTile(Vector3.zero);
-                if (!HasEnoughReachableTiles(playerStartTile)) 
+                if (!HasEnoughReachableTiles(playerStartTile))
                 {
                     foreach (var go in _placedTiles.Values)
-                        if (go != null) Destroy(go);
+                        if (go != null)
+                            Destroy(go);
                     _placedTiles.Clear();
                     yield return null;
                 }
@@ -79,19 +85,6 @@ namespace _Scripts.Island
                 }
             } while (true);
         }
-        /*private void SpawnStartingTroop()
-        {
-            var spawnTile = GetClosestHexTile(Vector3.zero); // Or smarter spawn later
-            if (spawnTile != null)
-            {
-                ServiceLocator.Instance.Get<TroopSpawner>()?.SpawnStartingUnit(spawnTile.transform.position);
-                Debug.Log("[HexagonManager] Spawned starting troop at " + spawnTile.GridPosition);
-            }
-            else
-            {
-                Debug.LogWarning("[HexagonManager] No spawn tile found to spawn troop!");
-            }
-        }*/
 
         private bool HasEnoughReachableTiles(HexTile startTile, int requiredCount = 6)
         {
@@ -105,7 +98,8 @@ namespace _Scripts.Island
             _placedTiles.Clear();
 
             Vector2Int center = Vector2Int.zero;
-            HexPrefabData buildablePrefab = HexPrefabs.Find(p => p.TileType == TileType.Grass || p.TileType == TileType.Forest);
+            HexPrefabData buildablePrefab =
+                HexPrefabs.Find(p => p.TileType == TileType.Grass || p.TileType == TileType.Forest);
             HexTile lastPlacedTile = PlaceHex(center, buildablePrefab);
 
             Queue<Vector2Int> frontier = new();
@@ -135,7 +129,7 @@ namespace _Scripts.Island
             }
 
             EnsureBuildableTileExists(lastPlacedTile);
-            
+
             ConnectNeighbors();
         }
 
@@ -210,7 +204,9 @@ namespace _Scripts.Island
                 return null;
             }
 
-            GameObject hex = Instantiate(prefabData.Prefab, worldPos, Quaternion.identity, TileParent);
+            float randomRotation = 60f * Random.Range(0, 6); // 0, 60, 120, 180, 240, 300
+            Quaternion rotation = Quaternion.Euler(0f, randomRotation, 0f);
+            GameObject hex = Instantiate(prefabData.Prefab, worldPos, rotation, TileParent);
             HexTile tile = hex.GetComponent<HexTile>();
             tile.GridPosition = offsetCoord;
             tile.TileType = prefabData.TileType;
@@ -282,6 +278,7 @@ namespace _Scripts.Island
                     new(coord.x - 1, coord.y + 1),
                 };
         }
+
         private IEnumerator PlayAllTilesSpawnAnimationsStaggered()
         {
             foreach (var tileGO in _placedTiles.Values)
@@ -294,7 +291,6 @@ namespace _Scripts.Island
                 }
             }
         }
-
 
 
         [Button("Show Expandable Tiles")]
@@ -333,7 +329,7 @@ namespace _Scripts.Island
 
             return spawnPositions;
         }
-        
+
         private void ConnectNeighbors()
         {
             foreach (var tileGO in _placedTiles.Values)
@@ -354,6 +350,63 @@ namespace _Scripts.Island
             Log.Info(this, "Neighbors connected.");
         }
 
+        public void GetIslandBounds(out Vector3 min, out Vector3 max)
+        {
+            min = Vector3.positiveInfinity;
+            max = Vector3.negativeInfinity;
+
+            foreach (var tile in _placedTiles.Values)
+            {
+                if (tile == null) continue;
+
+                Vector3 pos = tile.transform.position;
+                min = Vector3.Min(min, pos);
+                max = Vector3.Max(max, pos);
+            }
+
+            // Expand bounds slightly to allow camera padding
+            float padding = 3f;
+            min.x -= padding;
+            min.z -= padding;
+            max.x += padding;
+            max.z += padding;
+        }
+
+        public Vector3 GetIslandCenter()
+        {
+            Vector3 sum = Vector3.zero;
+            int count = 0;
+
+            foreach (var tile in _placedTiles.Values)
+            {
+                if (tile != null)
+                {
+                    sum += tile.transform.position;
+                    count++;
+                }
+            }
+
+            return count > 0 ? sum / count : Vector3.zero;
+        }
+        public bool TryGetTileAtWorldPos(Vector3 worldPos, out HexTile tile)
+        {
+            tile = null;
+            float closestDist = float.MaxValue;
+
+            foreach (var go in _placedTiles.Values)
+            {
+                if (go == null) continue;
+
+                float dist = Vector3.Distance(worldPos, go.transform.position);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    tile = go.GetComponent<HexTile>();
+                }
+            }
+
+            return tile != null;
+        }
+
     }
-    
 }

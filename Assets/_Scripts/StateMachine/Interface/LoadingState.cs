@@ -17,6 +17,7 @@ namespace _Scripts.StateMachine.States
         {
             base.Enter();
             Debug.Log("[LoadingState] Entered. Waiting for services...");
+            Application.targetFrameRate = 120;
         }
 
         public override void Tick()
@@ -38,7 +39,7 @@ namespace _Scripts.StateMachine.States
 
         public override void Exit()
         {
-            var hexManager = ServiceLocator.Instance.Get<HexagonManager>();
+            /*var hexManager = ServiceLocator.Instance.Get<HexagonManager>();
             var troopSpawner = ServiceLocator.Instance.Get<TroopSpawner>();
             
             // ✅ Find the spawn location (center tile or any logic you define)
@@ -51,7 +52,7 @@ namespace _Scripts.StateMachine.States
             else
             {
                 Debug.LogWarning("[LoadingState] No valid spawn tile found!");
-            }
+            }*/
 
             base.Exit();
         }

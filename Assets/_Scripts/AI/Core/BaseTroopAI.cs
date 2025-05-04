@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using _Scripts.Island;
+using UnityEngine;
 
 namespace _Scripts.AI.Core
 {
@@ -10,6 +11,7 @@ namespace _Scripts.AI.Core
 
         [Header("Target Info")]
         public Transform Target;
+        public HexTile CurrentTile { get; set; }
 
         protected virtual void Awake()
         {

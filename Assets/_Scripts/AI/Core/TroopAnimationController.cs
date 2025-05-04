@@ -16,6 +16,7 @@ namespace _Scripts.AI.Core
         private static readonly int AttackTriggerHash = Animator.StringToHash("AttackTrigger");
         private static readonly int IsDeadHash = Animator.StringToHash("IsDead");
         private static readonly int DieTriggerHash = Animator.StringToHash("DieTrigger");
+        private static readonly int CheerTriggerHash = Animator.StringToHash("CheerTrigger");
 
         private void Start()
         {
@@ -94,5 +95,14 @@ namespace _Scripts.AI.Core
         }
 
         #endregion
+        
+        /// <summary>
+        /// Triggers cheering animation (e.g., when tile is captured).
+        /// </summary>
+        public void PlayCheer()
+        {
+            foreach (var anim in _animators)
+                anim?.SetTrigger(CheerTriggerHash);
+        }
     }
 }
